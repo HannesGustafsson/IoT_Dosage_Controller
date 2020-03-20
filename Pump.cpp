@@ -24,8 +24,8 @@ void Pump::on_ccw(){
   running = true;
 }
 
-void Pump::off_limit(float limit_input){
-  if(limit < limit_input && running == true){
+void Pump::off_amount(int amount_input){
+  if(amount < amount_input && running == true){
     Serial.println("LIMIT REACHED");
     digitalWrite(p, LOW);
     digitalWrite(n, LOW);

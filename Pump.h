@@ -8,11 +8,12 @@ class Pump {
   byte n;
   bool running = false;
   byte flow_rate = 1;
-  float limit;
+  int amount;
+  int percentage;
 
   void init();
   void on_cw();
   void on_ccw();
-  void off_limit(float);
+  void off_amount(int);
   void off();
 };
