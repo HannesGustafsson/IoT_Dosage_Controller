@@ -1,4 +1,3 @@
-/* Comment this out to disable prints and save space */
 #define BLYNK_PRINT Serial
 
 #include <SPI.h>
@@ -37,7 +36,9 @@ Pump pump_2(PUMP_2_POSITIVE, PUMP_2_NEGATIVE);
 int total_percentage; // Total liquid percentages, adding all "pump.percentages" together
 int total_amount; // Total amount in mL, sets the max limit of the glass
 
-void setup() {
+
+void setup() 
+{
   Serial.begin(9600);
   
   scale.init();
@@ -48,39 +49,76 @@ void setup() {
   Blynk.begin(auth, ssid, pass);
 }
 
-void loop() {
+
+void loop() 
+{
   Blynk.run();
 }
 
-BLYNK_WRITE(V0){
-  pump_0.percentage = param.asInt();
+
+BLYNK_WRITE(V0)
+{
+  set_percentage(param.asFloat(), pump_0, pump_1, pump_2);
   set_total();
   print_status();
 }
 
-BLYNK_WRITE(V1){
-  pump_1.percentage = param.asInt();
+
+BLYNK_WRITE(V1)
+{
+  set_percentage(param.asFloat(), pump_1, pump_0, pump_2);
   set_total();
   print_status();
 }
 
-BLYNK_WRITE(V2){
-  pump_2.percentage = param.asInt();
+
+BLYNK_WRITE(V2)
+{
+  set_percentage(param.asFloat(), pump_2, pump_0, pump_1);
   set_total();
   print_status();
 }
 
-BLYNK_WRITE(V3){
+
+BLYNK_WRITE(V3)
+{
   total_amount = param.asInt();
   set_total();
   print_status();
 }
 
-void set_total(){
+
+void set_percentage(float input, Pump& a, Pump& b, Pump& c)
+{
+  if(input + (b.percentage + c.percentage) >= 100)
+  {
+    a.percentage = 100 - (b.percentage + c.percentage);
+    Serial.println(a.percentage);
+  }
+  else
+  {
+    a.percentage = input;
+    Serial.println(a.percentage);
+  }
+  
+  Blynk.virtualWrite(V0, pump_0.percentage);
+  Blynk.virtualWrite(V1, pump_1.percentage);
+  Blynk.virtualWrite(V2, pump_2.percentage);
+  
+  Blynk.virtualWrite(V4, pump_0.amount);
+  Blynk.virtualWrite(V5, pump_1.amount);
+  Blynk.virtualWrite(V6, pump_2.amount);
+}
+
+
+void set_total()
+{
   total_percentage = pump_0.percentage + pump_1.percentage + pump_2.percentage;
+  
   // To avoid dividing by 0
   if(total_percentage > 0){
-    pump_0.amount = (float(pump_0.percentage)/float(total_percentage)) * total_amount;
+    
+    pump_0.amount = (float(pump_0.percentage)/float(total_percentage)) * total_amount; // Cast to float during calculation since value is 0 - 1 and int would return 0
     pump_1.amount = (float(pump_1.percentage)/float(total_percentage)) * total_amount;
     pump_2.amount = (float(pump_2.percentage)/float(total_percentage)) * total_amount;
   }
@@ -91,63 +129,37 @@ void set_total(){
   }
 }
 
-void print_status(){
+
+// Prints all the values of chosen pump
+void pump_status(Pump p)
+{
+  Serial.print(p.amount);
+  Serial.print("mL  \t");
+  Serial.print(p.percentage);
+  Serial.print("%\t running: ");
+  Serial.println(p.running);
+}
+
+// Prints total values, status of all pumps, as well as current measurement
+void print_status()
+{
   Serial.print("Total:\t");
   Serial.print(total_amount);
   Serial.print("mL  \t");
   Serial.print(total_percentage);
-  Serial.println("%");
-  Serial.println("------");
+  Serial.println("%\n-----");
 
-  // PUMP 0: STATUS
   Serial.print("Pump0:\t");
-  Serial.print(pump_0.amount);
-  Serial.print("mL  \t");
-  Serial.print(pump_0.percentage);
-  Serial.print("%\tActual: ");
-  if(total_percentage > 0){
-    Serial.print(int(float(pump_0.percentage)/float(total_percentage) * 100));
-  }
-  else{
-    Serial.print("0");
-  }
-  Serial.print("%\t running: ");
-  Serial.println(pump_0.running);
-
-  // PUMP 1: STATUS
+  pump_status(pump_0);
   Serial.print("Pump1:\t");
-  Serial.print(pump_1.amount);
-  Serial.print("mL  \t");
-  Serial.print(pump_1.percentage);
-  Serial.print("%\tActual: ");
-  if(total_percentage > 0){
-    Serial.print(int(float(pump_1.percentage)/float(total_percentage) * 100));
-  }
-  else{
-    Serial.print("0");
-  }
-  Serial.print("%\t running: ");
-  Serial.println(pump_1.running);
-
-  // PUMP 2: STATUS
+  pump_status(pump_1);
   Serial.print("Pump2:\t");
-  Serial.print(pump_2.amount);
-  Serial.print("mL  \t");
-  Serial.print(pump_2.percentage);
-  Serial.print("%\tActual: ");
-  if(total_percentage > 0){
-    Serial.print(int(float(pump_2.percentage)/float(total_percentage) * 100));
-  }
-  else{
-    Serial.print("0");
-  }
-  Serial.print("%\t running: ");
-  Serial.println(pump_2.running);
+  pump_status(pump_2);
 
+  // CURRENT: STATUS
   Serial.print("CURRENT:");
   Serial.print(scale.value);
-  Serial.println("mL  \t");
-  Serial.println("-----------------------------------");
+  Serial.println("mL\n-----------------------------------");
 }
 // BENCHMARK, How long it takes to pump 1dl of water
 // PUMP_0 CW:1m30s CCW:1m30s
