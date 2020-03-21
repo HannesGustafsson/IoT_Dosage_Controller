@@ -21,7 +21,6 @@
 #define PUMP_2_POSITIVE 7
 #define PUMP_2_NEGATIVE 8
 
-
 // Blynk code & Network Settings
 char auth[] = "3bQD5Gx07mXDwURgOcgTfJF0_akMI0nA";
 char ssid[] = "!";
@@ -39,6 +38,16 @@ Scale scale(SERIAL_DATA_OUTPUT, SERIAL_CLOCK_OUTPUT);
 Pump pump_0(PUMP_0_POSITIVE, PUMP_0_NEGATIVE);
 Pump pump_1(PUMP_1_POSITIVE, PUMP_1_NEGATIVE);
 Pump pump_2(PUMP_2_POSITIVE, PUMP_2_NEGATIVE);
+
+// The use of an array of Pump pointers culd aso be used in this program
+// to enable the use of for-loops instead of repeating code, which would be useful is more pumps were used,
+// as well as creating new options for cycling through the object varables.
+// WILL NOT BE USED IN THE FOLLOWING PROGRAM. DEMONSTRATION PURPOSES ONLY:
+//#define ARRAY_SIZE 3
+//Pump *pump_array[ARRAY_SIZE] = { new Pump(PUMP_0_POSITIVE, PUMP_0_NEGATIVE),
+//                                 new Pump(PUMP_1_POSITIVE, PUMP_1_NEGATIVE),
+//                                 new Pump(PUMP_2_POSITIVE, PUMP_2_NEGATIVE)};
+
 
 int total_percentage; // Total liquid percentages, adding all "pump.percentage" together
 int total_amount; // Total amount in mL, sets the max limit of the glass
@@ -109,6 +118,7 @@ BLYNK_WRITE(V7)
   {
     scale.on();
     timer.enable(start_timer);
+    reverse = false;
   }
   else
   {
@@ -132,7 +142,6 @@ void start()
     pump_0.on_cw(scale.value);
     pump_1.on_cw(scale.value);
     pump_2.on_cw(scale.value);
-    reverse = false;
     running = true;
   }
   else if (running == true)
@@ -149,14 +158,15 @@ void start()
   }
 }
 
-// Runs the pumps once in reverse for 3.5 seconds to remove all exess liquid from the tubes
+
+// Runs the pumps once in reverse for 3.5 seconds to remove all excess liquid from the tubes
+// and provide a clean start for all pump, meaning that they have to pump liquid the same distance
+// after for example only one pump was used previously
 void clean()
 {
   if(pump_0.running == false && pump_1.running == false && pump_2.running == false)
     {
       current_millis = millis();
-      Serial.println(start_millis);
-      Serial.println(current_millis);
       
       if(reverse == false)
       {

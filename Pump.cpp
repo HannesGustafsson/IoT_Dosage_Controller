@@ -30,7 +30,6 @@ void Pump::on_ccw()
 {
   digitalWrite(p, LOW);
   digitalWrite(n, HIGH);
-  running = true;
 }
 
 
