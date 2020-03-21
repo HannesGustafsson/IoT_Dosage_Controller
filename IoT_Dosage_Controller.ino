@@ -26,6 +26,12 @@ char auth[] = "3bQD5Gx07mXDwURgOcgTfJF0_akMI0nA";
 char ssid[] = "!";
 char pass[] = "Hannes93Gustafsson";
 BlynkTimer timer;
+int start_timer;
+bool running = false;
+bool reverse = false;
+
+unsigned long start_millis;
+unsigned long current_millis;
 
 // Creating Scale & Pump objects
 Scale scale(SERIAL_DATA_OUTPUT, SERIAL_CLOCK_OUTPUT);
@@ -33,10 +39,10 @@ Pump pump_0(PUMP_0_POSITIVE, PUMP_0_NEGATIVE);
 Pump pump_1(PUMP_1_POSITIVE, PUMP_1_NEGATIVE);
 Pump pump_2(PUMP_2_POSITIVE, PUMP_2_NEGATIVE);
 
-int total_percentage; // Total liquid percentages, adding all "pump.percentages" together
+int total_percentage; // Total liquid percentages, adding all "pump.percentage" together
 int total_amount; // Total amount in mL, sets the max limit of the glass
 
-
+// ==================================================< PROGRAM START >==================================================
 void setup() 
 {
   Serial.begin(9600);
@@ -47,23 +53,29 @@ void setup()
   pump_2.init();
 
   Blynk.begin(auth, ssid, pass);
+  start_timer = timer.setInterval(300L, start);
+  timer.disable(start_timer);
 }
 
 
 void loop() 
 {
   Blynk.run();
+  timer.run();
 }
+// ==================================================< PROGRAM END >==================================================
 
 
+// Controls the 1st Blynk slider & and values for pump_0
 BLYNK_WRITE(V0)
 {
-  set_percentage(param.asFloat(), pump_0, pump_1, pump_2);
-  set_total();
-  print_status();
+  set_percentage(param.asFloat(), pump_0, pump_1, pump_2); // Uses "V0" slider parameter as float & pointers to all three pumps
+  set_total(); // Recalculates total amount (of liquid) & individual amount for the pumps
+  print_status(); // Prints all pump values & total values
 }
 
 
+// Controls the 2nd Blynk slider & and values for pump_1
 BLYNK_WRITE(V1)
 {
   set_percentage(param.asFloat(), pump_1, pump_0, pump_2);
@@ -72,6 +84,7 @@ BLYNK_WRITE(V1)
 }
 
 
+// Controls the 3rd Blynk slider & and values for pump_2
 BLYNK_WRITE(V2)
 {
   set_percentage(param.asFloat(), pump_2, pump_0, pump_1);
@@ -80,6 +93,7 @@ BLYNK_WRITE(V2)
 }
 
 
+// Controls the 4th Blynk slider & the maximum liquid value
 BLYNK_WRITE(V3)
 {
   total_amount = param.asInt();
@@ -88,29 +102,108 @@ BLYNK_WRITE(V3)
 }
 
 
+BLYNK_WRITE(V7)
+{
+  if(param.asInt() == 1)
+  {
+    scale.on();
+    timer.enable(start_timer);
+  }
+  else
+  {
+    pump_0.off();
+    pump_1.off();
+    pump_2.off();
+    
+    timer.disable(start_timer);
+    scale.off();
+    running = false;
+  }
+}
+
+
+void start()
+{
+  if (running == false)
+  {
+    scale.zero();
+    Serial.println("STARTING");
+    pump_0.on_cw(scale.value);
+    pump_1.on_cw(scale.value);
+    pump_2.on_cw(scale.value);
+    reverse = false;
+    running = true;
+  }
+  else if (running == true)
+  {
+    scale.measure();
+    Blynk.virtualWrite(V8, scale.value);
+    
+    pump_0.off_amount(scale.value);
+    pump_1.off_amount(scale.value);
+    pump_2.off_amount(scale.value);
+    
+    clean();
+  }
+}
+
+// Runs the pumps once in reverse for 3.5 seconds to remove all exess liquid from the tubes
+void clean()
+{
+  if(pump_0.running == false && pump_1.running == false && pump_2.running == false)
+    {
+      current_millis = millis();
+      Serial.println(start_millis);
+      Serial.println(current_millis);
+      
+      if(reverse == false)
+      {
+        start_millis = millis();
+        reverse = true;
+        Serial.println("REVERSE START");
+      }
+      else if(reverse == true && (current_millis - start_millis < 3500))
+      {
+        pump_0.on_ccw();
+        pump_1.on_ccw();
+        pump_2.on_ccw();
+      }
+      else
+      {
+        pump_0.off();
+        pump_1.off();
+        pump_2.off();
+      }
+    }
+}
+
+// Calculates the individual percentage of the total user specified amount of liquid a single pump is to deliver
+// based on the value of the others, to make sure the total percentage is never over 100%
+// and to enable accurate control of all three pumps individually
 void set_percentage(float input, Pump& a, Pump& b, Pump& c)
 {
+  // If the (total amount + input) is more than 100%, only add the difference between 100% and the already specified total
   if(input + (b.percentage + c.percentage) >= 100)
   {
     a.percentage = 100 - (b.percentage + c.percentage);
     Serial.println(a.percentage);
   }
+  // Otherwise just use input value
   else
   {
     a.percentage = input;
     Serial.println(a.percentage);
   }
-  
+
+  // Overwrites the Blynk sliders to display the correct percentage value
   Blynk.virtualWrite(V0, pump_0.percentage);
   Blynk.virtualWrite(V1, pump_1.percentage);
   Blynk.virtualWrite(V2, pump_2.percentage);
-  
-  Blynk.virtualWrite(V4, pump_0.amount);
-  Blynk.virtualWrite(V5, pump_1.amount);
-  Blynk.virtualWrite(V6, pump_2.amount);
 }
 
 
+// Calculates amount for each pump to deliver based on total amount of liquid specified
+// and percentage value of the pumps
 void set_total()
 {
   total_percentage = pump_0.percentage + pump_1.percentage + pump_2.percentage;
@@ -118,17 +211,31 @@ void set_total()
   // To avoid dividing by 0
   if(total_percentage > 0){
     
-    pump_0.amount = (float(pump_0.percentage)/float(total_percentage)) * total_amount; // Cast to float during calculation since value is 0 - 1 and int would return 0
-    pump_1.amount = (float(pump_1.percentage)/float(total_percentage)) * total_amount;
-    pump_2.amount = (float(pump_2.percentage)/float(total_percentage)) * total_amount;
+    pump_0.amount = (float(pump_0.percentage) * total_amount) / 100; // Cast to float during calculation since value is 0 - 1 and int would return 0
+    pump_1.amount = (float(pump_1.percentage) * total_amount) / 100;
+    pump_2.amount = (float(pump_2.percentage) * total_amount) / 100;
   }
   else{
     pump_0.amount = 0;
     pump_1.amount = 0;
     pump_2.amount = 0;
   }
+  
+  // Displays the calculated amount of mL for each pump on buttons underneath the sliders
+  Blynk.virtualWrite(V4, pump_0.amount);
+  Blynk.virtualWrite(V5, pump_1.amount);
+  Blynk.virtualWrite(V6, pump_2.amount);
 }
 
+// Returns the number of active pumps
+int pumps_running()
+{
+  int temp = 0;
+  if(pump_0.running == true) {temp += 1;}
+  if(pump_1.running == true) {temp += 1;}
+  if(pump_2.running == true) {temp += 1;}
+  return temp;
+}
 
 // Prints all the values of chosen pump
 void pump_status(Pump p)
@@ -139,6 +246,7 @@ void pump_status(Pump p)
   Serial.print("%\t running: ");
   Serial.println(p.running);
 }
+
 
 // Prints total values, status of all pumps, as well as current measurement
 void print_status()
@@ -161,6 +269,7 @@ void print_status()
   Serial.print(scale.value);
   Serial.println("mL\n-----------------------------------");
 }
+
 // BENCHMARK, How long it takes to pump 1dl of water
 // PUMP_0 CW:1m30s CCW:1m30s
 // PUMP_1 CW:1m30s CCW:1m30s

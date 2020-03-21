@@ -17,7 +17,7 @@ void Scale::on(){
   Serial.println("SCALE: ON");
 }
 
-// Disables power to the scale module
+// Disables power to the scale module to save power
 void Scale::off(){
   hx711.power_down();
   Serial.println("SCALE: OFF");
