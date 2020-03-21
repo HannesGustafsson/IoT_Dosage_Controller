@@ -139,9 +139,10 @@ void start()
     scale.measure();
     Blynk.virtualWrite(V8, scale.value);
     
-    pump_0.off_amount(scale.value);
-    pump_1.off_amount(scale.value);
-    pump_2.off_amount(scale.value);
+    int pump_count = pumps_running();
+    pump_0.off_amount(scale.value, scale.previous_value, pump_count);
+    pump_1.off_amount(scale.value, scale.previous_value, pump_count);
+    pump_2.off_amount(scale.value, scale.previous_value, pump_count);
     
     clean();
   }

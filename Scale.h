@@ -6,6 +6,7 @@ class Scale {
   Scale(byte, byte);
   HX711 hx711;
   int value;
+  int previous_value;
   int cal_fact = 370;
 
   void init();

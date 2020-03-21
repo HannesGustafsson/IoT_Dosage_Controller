@@ -34,9 +34,11 @@ void Pump::on_ccw()
 }
 
 
-void Pump::off_amount(int scale_value)
+void Pump::off_amount(int value, int previous_value, int pump_count)
 {
-  if(scale_value > amount && running == true)
+  amount_pumped += ((float(value) - float(previous_value)) / float(pump_count));
+  
+  if(amount_pumped > amount && running == true)
   {
     Serial.println("LIMIT REACHED");
     digitalWrite(p, LOW);
