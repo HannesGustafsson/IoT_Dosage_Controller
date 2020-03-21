@@ -43,6 +43,7 @@ void Pump::off_amount(int value, int previous_value, int pump_count)
     Serial.println("LIMIT REACHED");
     digitalWrite(p, LOW);
     digitalWrite(n, LOW);
+    amount_pumped = 0;
     running = false;
   }
 }
@@ -52,5 +53,6 @@ void Pump::off()
 {
   digitalWrite(p, LOW);
   digitalWrite(n, LOW);
+  amount_pumped = 0;
   running = false;
 }
