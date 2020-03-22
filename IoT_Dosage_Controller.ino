@@ -21,6 +21,9 @@
 #define PUMP_2_POSITIVE 7
 #define PUMP_2_NEGATIVE 8
 
+#define WATER_IN 0
+#define WATER_OUT 1
+
 // Blynk code & Network Settings
 char auth[] = "3bQD5Gx07mXDwURgOcgTfJF0_akMI0nA";
 char ssid[] = "!";
@@ -39,7 +42,7 @@ Pump pump_0(PUMP_0_POSITIVE, PUMP_0_NEGATIVE);
 Pump pump_1(PUMP_1_POSITIVE, PUMP_1_NEGATIVE);
 Pump pump_2(PUMP_2_POSITIVE, PUMP_2_NEGATIVE);
 
-// The use of an array of Pump pointers culd aso be used in this program
+// The use of an array of Pump pointers could aso be used in this program
 // to enable the use of for-loops instead of repeating code, which would be useful is more pumps were used,
 // as well as creating new options for cycling through the object varables.
 // WILL NOT BE USED IN THE FOLLOWING PROGRAM. DEMONSTRATION PURPOSES ONLY:
@@ -62,6 +65,9 @@ void setup()
   pump_1.init();
   pump_2.init();
 
+  pinMode(WATER_OUT, OUTPUT);
+  digitalWrite(WATER_OUT, LOW);
+  pinMode(WATER_IN, INPUT);
   Blynk.begin(auth, ssid, pass);
   start_timer = timer.setInterval(300L, start);
   timer.disable(start_timer);
@@ -111,7 +117,7 @@ BLYNK_WRITE(V3)
   print_status();
 }
 
-
+// Controls the Blynk start button which in turn enables the start function
 BLYNK_WRITE(V7)
 {
   if(param.asInt() == 1)
@@ -132,6 +138,14 @@ BLYNK_WRITE(V7)
   }
 }
 
+BLYNK_WRITE(V10)
+{
+  if(param.asInt() == 1)
+  {
+    bool temp = water_connection();
+  }
+}
+
 
 void start()
 {
@@ -143,6 +157,12 @@ void start()
     pump_1.on_cw(scale.value);
     pump_2.on_cw(scale.value);
     running = true;
+  }
+  else if(running == true && water_connection() == false)
+  {
+    pump_0.off();
+    pump_1.off();
+    pump_2.off();
   }
   else if (running == true)
   {
@@ -188,6 +208,28 @@ void clean()
       }
     }
 }
+
+// Sends a electrical pulse through the water sensors and controld if the signal returns
+// thus implying the that all three water tubes are connected to a conductive liquid
+bool water_connection()
+{
+  digitalWrite(WATER_OUT, HIGH);
+  
+  if(digitalRead(WATER_IN == HIGH))
+  {
+    Serial.println("WATER CONNECTION: TRUE");
+    digitalWrite(WATER_OUT, LOW);
+    return true;
+    
+  }
+  else
+  {
+    Serial.println("WATER CONNECTION: FALSE");
+    digitalWrite(WATER_OUT, LOW);
+    return false;
+  }
+}
+
 
 // Calculates the individual percentage of the total user specified amount of liquid a single pump is to deliver
 // based on the value of the others, to make sure the total percentage is never over 100%
