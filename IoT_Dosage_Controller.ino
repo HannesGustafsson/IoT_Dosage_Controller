@@ -142,7 +142,14 @@ BLYNK_WRITE(V10)
 {
   if(param.asInt() == 1)
   {
-    bool temp = water_connection();
+    if(water_connection() == true)
+    {
+      Serial.println("WATER CONNECTION: TRUE");
+    }
+    else if(water_connection() == false)
+    {
+      Serial.println("WATER CONNECTION: FALSE");
+    }
   }
 }
 
@@ -160,6 +167,7 @@ void start()
   }
   else if(running == true && water_connection() == false)
   {
+    Serial.println("WATER CONNECTION: FALSE");
     pump_0.off();
     pump_1.off();
     pump_2.off();
@@ -217,14 +225,12 @@ bool water_connection()
   
   if(digitalRead(WATER_IN == HIGH))
   {
-    Serial.println("WATER CONNECTION: TRUE");
     digitalWrite(WATER_OUT, LOW);
     return true;
     
   }
   else
   {
-    Serial.println("WATER CONNECTION: FALSE");
     digitalWrite(WATER_OUT, LOW);
     return false;
   }
