@@ -30,6 +30,8 @@ char ssid[] = "!";
 char pass[] = "Hannes93Gustafsson";
 BlynkTimer timer;
 int start_timer;
+int calibration_timer;
+
 bool running = false;
 bool reverse = false;
 
@@ -56,25 +58,32 @@ int total_percentage; // Total liquid percentages, adding all "pump.percentage" 
 int total_amount; // Total amount in mL, sets the max limit of the glass
 
 // ==================================================< PROGRAM START >==================================================
-void setup() 
+void setup()
 {
   Serial.begin(9600);
-  
+
   scale.init();
   pump_0.init();
   pump_1.init();
   pump_2.init();
 
+  pump_0.flow_rate = 1; // Flow rate 1 is standard speed
+  pump_1.flow_rate = 1;
+  pump_2.flow_rate = 1.2; // Flow rate 1.2 means the pump is 20% faster than baseline and it's percentage of the total combined flow/liquid pumped will be higher
+
   pinMode(WATER_OUT, OUTPUT);
   digitalWrite(WATER_OUT, LOW);
   pinMode(WATER_IN, INPUT);
   Blynk.begin(auth, ssid, pass);
+
   start_timer = timer.setInterval(300L, start);
+  calibration_timer = timer.setInterval(300L, calibrate);
   timer.disable(start_timer);
+  timer.disable(calibration_timer);
 }
 
 
-void loop() 
+void loop()
 {
   Blynk.run();
   timer.run();
@@ -117,10 +126,11 @@ BLYNK_WRITE(V3)
   print_status();
 }
 
-// Controls the Blynk start button which in turn enables the start function
+
+// Controls the Blynk START button which in turn enables the START function
 BLYNK_WRITE(V7)
 {
-  if(param.asInt() == 1)
+  if (param.asInt() == 1)
   {
     scale.on();
     timer.enable(start_timer);
@@ -131,25 +141,31 @@ BLYNK_WRITE(V7)
     pump_0.off();
     pump_1.off();
     pump_2.off();
-    
+
     timer.disable(start_timer);
     scale.off();
     running = false;
   }
 }
 
+
+// Controls the Blynk CALIBRATION button which in turn enables the CALIBRATION function
 BLYNK_WRITE(V10)
 {
-  if(param.asInt() == 1)
+  if (param.asInt() == 1)
   {
-    if(water_connection() == true)
-    {
-      Serial.println("WATER CONNECTION: TRUE");
-    }
-    else if(water_connection() == false)
-    {
-      Serial.println("WATER CONNECTION: FALSE");
-    }
+    scale.on();
+    scale.zero();
+    timer.enable(calibration_timer);
+  }
+  else
+  {
+    pump_0.off();
+    pump_1.off();
+    pump_2.off();
+
+    timer.disable(calibration_timer);
+    scale.off();
   }
 }
 
@@ -165,7 +181,7 @@ void start()
     pump_2.on_cw(scale.value);
     running = true;
   }
-  else if(running == true && water_connection() == false)
+  else if (running == true && water_connection() == false)
   {
     Serial.println("WATER CONNECTION: FALSE");
     pump_0.off();
@@ -174,15 +190,88 @@ void start()
   }
   else if (running == true)
   {
-    scale.measure();
     Blynk.virtualWrite(V8, scale.value);
-    
-    int pump_count = pumps_running();
-    pump_0.off_amount(scale.value, scale.previous_value, pump_count);
-    pump_1.off_amount(scale.value, scale.previous_value, pump_count);
-    pump_2.off_amount(scale.value, scale.previous_value, pump_count);
-    
+
+    float flow = get_flow();
+
+    scale.measure();
+    pump_0.off_amount(scale.value, scale.previous_value, flow);
+    pump_1.off_amount(scale.value, scale.previous_value, flow);
+    pump_2.off_amount(scale.value, scale.previous_value, flow);
     clean();
+  }
+}
+
+
+
+// Calibrates all three pumps
+void calibrate()
+{
+  if (pump_0.calibrated == false)
+  {
+    Serial.println("--------------------------\nPUMP 0");
+    calibrate_pump(pump_0, scale.value, scale.previous_value, start_millis, current_millis);
+  }
+  else if (pump_1.calibrated == false)
+  {
+    Serial.println("--------------------------\nPUMP 1");
+    calibrate_pump(pump_1, scale.value, scale.previous_value, start_millis, current_millis);
+  }
+  else if (pump_2.calibrated == false)
+  {
+    Serial.println("--------------------------\nPUMP 2");
+    calibrate_pump(pump_2, scale.value, scale.previous_value, start_millis, current_millis);
+  }
+  else
+  {
+    clean();
+  }
+}
+
+
+void calibrate_pump(Pump& p, float value, float previous_value, unsigned long& start, unsigned long& current)
+{
+  
+  scale.measure();
+
+  if (p.calibration_start == false)
+  {
+    Serial.println("CALIBRATION START");
+    start = millis();
+    scale.zero();
+
+    p.amount = 10;
+    p.on_cw(scale.value);
+    p.calibration_start = true;
+  }
+
+  if (p.calibration_start == true)
+  {
+    current = millis();
+    Serial.print("START MILLIS: ");
+    Serial.print(start);
+    Serial.print(" CURRENT MILLIS: ");
+    Serial.print(current);
+    Serial.println(" ");
+
+    p.amount_pumped += (value - previous_value);
+    Serial.print("PUMPED: ");
+    Serial.print(p.amount_pumped);
+    Serial.print(" VALUE: ");
+    Serial.print(value);
+    Serial.print(" - PREVIOUS VALUE: ");
+    Serial.println(previous_value);
+
+    if (current > (start + 10000))
+    {
+      p.flow_rate = (p.amount_pumped);
+      p.off();
+      Serial.print("FLOW RATE: ");
+      Serial.println(p.flow_rate);
+      p.calibration_start = false;
+      p.calibrated = true;
+
+    }
   }
 }
 
@@ -192,29 +281,29 @@ void start()
 // after for example only one pump was used previously
 void clean()
 {
-  if(pump_0.running == false && pump_1.running == false && pump_2.running == false)
+  if (get_running() == 0)
+  {
+    current_millis = millis();
+
+    if (reverse == false)
     {
-      current_millis = millis();
-      
-      if(reverse == false)
-      {
-        start_millis = millis();
-        reverse = true;
-        Serial.println("REVERSE START");
-      }
-      else if(reverse == true && (current_millis - start_millis < 3500))
-      {
-        pump_0.on_ccw();
-        pump_1.on_ccw();
-        pump_2.on_ccw();
-      }
-      else
-      {
-        pump_0.off();
-        pump_1.off();
-        pump_2.off();
-      }
+      start_millis = millis();
+      reverse = true;
+      Serial.println("REVERSE START");
     }
+    else if (reverse == true && (current_millis - start_millis < 3500))
+    {
+      pump_0.on_ccw();
+      pump_1.on_ccw();
+      pump_2.on_ccw();
+    }
+    else
+    {
+      pump_0.off();
+      pump_1.off();
+      pump_2.off();
+    }
+  }
 }
 
 // Sends a electrical pulse through the water sensors and controld if the signal returns
@@ -222,12 +311,11 @@ void clean()
 bool water_connection()
 {
   digitalWrite(WATER_OUT, HIGH);
-  
-  if(digitalRead(WATER_IN == HIGH))
+
+  if (digitalRead(WATER_IN == HIGH))
   {
     digitalWrite(WATER_OUT, LOW);
     return true;
-    
   }
   else
   {
@@ -243,7 +331,7 @@ bool water_connection()
 void set_percentage(float input, Pump& a, Pump& b, Pump& c)
 {
   // If the (total amount + input) is more than 100%, only add the difference between 100% and the already specified total
-  if(input + (b.percentage + c.percentage) >= 100)
+  if (input + (b.percentage + c.percentage) >= 100)
   {
     a.percentage = 100 - (b.percentage + c.percentage);
     Serial.println(a.percentage);
@@ -267,20 +355,20 @@ void set_percentage(float input, Pump& a, Pump& b, Pump& c)
 void set_total()
 {
   total_percentage = pump_0.percentage + pump_1.percentage + pump_2.percentage;
-  
+
   // To avoid dividing by 0
-  if(total_percentage > 0){
-    
+  if (total_percentage > 0) {
+
     pump_0.amount = (float(pump_0.percentage) * total_amount) / 100; // Cast to float during calculation since value is 0 - 1 and int would return 0
     pump_1.amount = (float(pump_1.percentage) * total_amount) / 100;
     pump_2.amount = (float(pump_2.percentage) * total_amount) / 100;
   }
-  else{
+  else {
     pump_0.amount = 0;
     pump_1.amount = 0;
     pump_2.amount = 0;
   }
-  
+
   // Displays the calculated amount of mL for each pump on buttons underneath the sliders
   Blynk.virtualWrite(V4, pump_0.amount);
   Blynk.virtualWrite(V5, pump_1.amount);
@@ -288,14 +376,38 @@ void set_total()
 }
 
 // Returns the number of active pumps
-int pumps_running()
+float get_running()
 {
   int temp = 0;
-  if(pump_0.running == true) {temp += 1;}
-  if(pump_1.running == true) {temp += 1;}
-  if(pump_2.running == true) {temp += 1;}
+  if (pump_0.running == true) {
+    temp += 1;
+  }
+  if (pump_1.running == true) {
+    temp += 1;
+  }
+  if (pump_2.running == true) {
+    temp += 1;
+  }
   return temp;
 }
+
+
+// Returns the combined flow rate of active pumps
+float get_flow()
+{
+  float temp = 0;
+  if (pump_0.running == true) {
+    temp += pump_0.flow_rate;
+  }
+  if (pump_1.running == true) {
+    temp += pump_1.flow_rate;
+  }
+  if (pump_2.running == true) {
+    temp += pump_2.flow_rate;
+  }
+  return temp;
+}
+
 
 // Prints all the values of chosen pump
 void pump_status(Pump p)
@@ -303,7 +415,10 @@ void pump_status(Pump p)
   Serial.print(p.amount);
   Serial.print("mL  \t");
   Serial.print(p.percentage);
-  Serial.print("%\t running: ");
+  Serial.print("%\t ");
+  Serial.print("flow rate factor: ");
+  Serial.print(p.flow_rate);
+  Serial.print("\trunning: ");
   Serial.println(p.running);
 }
 

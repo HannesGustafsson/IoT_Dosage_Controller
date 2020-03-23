@@ -7,13 +7,17 @@ class Pump {
   byte p;
   byte n;
   bool running = false;
-  int amount;
+  bool calibration_start = false;
+  bool calibrated = false;
+  float amount;
   float amount_pumped;
+  float flow_rate = 1;
   int percentage;
 
   void init();
-  void on_cw(int);
+  void calibrate(float, float, unsigned long&, unsigned long&, bool&);
+  void on_cw(float);
   void on_ccw();
-  void off_amount(int, int, int);
+  void off_amount(float, float, float);
   void off();
 };

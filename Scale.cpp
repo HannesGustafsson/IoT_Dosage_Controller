@@ -32,6 +32,7 @@ void Scale::zero()
 {
   hx711.tare();
   value = 0;
+  previous_value = value;
   Serial.println("SCALE: TARE");
 }
 
