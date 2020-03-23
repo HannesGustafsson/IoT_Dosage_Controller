@@ -1,4 +1,5 @@
 (( )) = creators notes
+[...] = unecessary text removed
 
 SCALE: INITIALIZED
 PUMP: INITIALIZED
@@ -74,31 +75,9 @@ PUMP 0
 START MILLIS: 22560 CURRENT MILLIS: 28124 
 PUMPED: 0.86 VALUE: 0.86 - PREVIOUS VALUE: 0.38
 --------------------------
-PUMP 0
-2.5g
-START MILLIS: 22560 CURRENT MILLIS: 28645 
-PUMPED: 1.49 VALUE: 1.49 - PREVIOUS VALUE: 0.86
---------------------------
-PUMP 0
-3.0g
-START MILLIS: 22560 CURRENT MILLIS: 29167 
-PUMPED: 2.11 VALUE: 2.11 - PREVIOUS VALUE: 1.49
---------------------------
-PUMP 0
-3.6g
-START MILLIS: 22560 CURRENT MILLIS: 29689 
-PUMPED: 2.63 VALUE: 2.63 - PREVIOUS VALUE: 2.11
---------------------------
-PUMP 0
-4.0g
-START MILLIS: 22560 CURRENT MILLIS: 30210 
-PUMPED: 3.20 VALUE: 3.20 - PREVIOUS VALUE: 2.63
---------------------------
-PUMP 0
-4.5g
-START MILLIS: 22560 CURRENT MILLIS: 30732 
-PUMPED: 3.71 VALUE: 3.71 - PREVIOUS VALUE: 3.20
---------------------------
+
+[...]
+
 PUMP 0
 5.0g
 START MILLIS: 22560 CURRENT MILLIS: 31253 
@@ -119,7 +98,9 @@ PUMP 0
 START MILLIS: 22560 CURRENT MILLIS: 32819 
 PUMPED: 5.79 VALUE: 5.79 - PREVIOUS VALUE: 5.32
 FLOW RATE: 5.79
-((calibration finished, 5.79mL per 10 sec))
+
+ ((calibration finished, 5.79mL per 10 sec))
+
 --------------------------
 PUMP 1
 7.2g
@@ -310,7 +291,8 @@ STARTING
 85.7g
 20.26 += (84.88 - 83.08) * 0.24
 
-LIMIT REACHED
+LIMIT REACHED 
+((pump 0 reached it's limit))
 
 28.01 += (84.88 - 83.08) * 0.33 
 36.61 += (84.88 - 83.08) * 0.43 
@@ -324,6 +306,7 @@ LIMIT REACHED
 30.11 += (89.72 - 88.35) * 0.43
 
 LIMIT REACHED
+((pump 1 reached it's limit))
 
 39.35 += (89.72 - 88.35) * 0.57
 91.6g
