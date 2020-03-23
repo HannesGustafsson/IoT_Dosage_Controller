@@ -1,0 +1,378 @@
+(( )) = creators notes
+
+SCALE: INITIALIZED
+PUMP: INITIALIZED
+PUMP: INITIALIZED
+PUMP: INITIALIZED
+
+[3024] IP: xxx.xxx.x.xxx
+[3025] 
+    ___  __          __
+   / _ )/ /_ _____  / /__
+  / _  / / // / _ \/  '_/
+ /____/_/\_, /_//_/_/\_\
+        /___/ v0.6.0 on MKR1000
+
+[3026] Connecting to blynk-cloud.com:80
+[3370] Ready (ping: 35ms).
+
+((Pressed "calibrate" here))
+
+SCALE: ON
+SCALE: TARE
+--------------------------
+PUMP 0 <- ((Name of pump being calibrated))
+0.1g <- ((Value of scale))
+CALIBRATION START
+SCALE: TARE 
+START MILLIS: 22560 CURRENT MILLIS: 23429 
+PUMPED: 0.00 VALUE: 0.00 - PREVIOUS VALUE: 0.00
+((amount pumped))((scale current value))((scale previous value))
+--------------------------
+PUMP 0
+-0.2g
+START MILLIS: 22560 CURRENT MILLIS: 23951 
+PUMPED: 0.00 VALUE: 0.00 - PREVIOUS VALUE: 0.00
+--------------------------
+PUMP 0
+-0.1g
+START MILLIS: 22560 CURRENT MILLIS: 24472 
+PUMPED: -0.01 VALUE: -0.01 - PREVIOUS VALUE: 0.00
+--------------------------
+PUMP 0
+-0.0g
+START MILLIS: 22560 CURRENT MILLIS: 24994 
+PUMPED: -0.20 VALUE: -0.20 - PREVIOUS VALUE: -0.01
+--------------------------
+PUMP 0
+0.0g
+START MILLIS: 22560 CURRENT MILLIS: 25515 
+PUMPED: -0.03 VALUE: -0.03 - PREVIOUS VALUE: -0.20
+--------------------------
+PUMP 0
+-0.0g
+START MILLIS: 22560 CURRENT MILLIS: 26037 
+PUMPED: -0.04 VALUE: -0.04 - PREVIOUS VALUE: -0.03
+--------------------------
+PUMP 0
+0.1g
+START MILLIS: 22560 CURRENT MILLIS: 26559 
+PUMPED: 0.08 VALUE: 0.08 - PREVIOUS VALUE: -0.04
+--------------------------
+PUMP 0
+0.7g
+START MILLIS: 22560 CURRENT MILLIS: 27080 
+PUMPED: 0.08 VALUE: 0.08 - PREVIOUS VALUE: 0.08
+--------------------------
+PUMP 0
+1.2g
+START MILLIS: 22560 CURRENT MILLIS: 27602 
+PUMPED: 0.38 VALUE: 0.38 - PREVIOUS VALUE: 0.08
+--------------------------
+PUMP 0
+1.8g
+START MILLIS: 22560 CURRENT MILLIS: 28124 
+PUMPED: 0.86 VALUE: 0.86 - PREVIOUS VALUE: 0.38
+--------------------------
+PUMP 0
+2.5g
+START MILLIS: 22560 CURRENT MILLIS: 28645 
+PUMPED: 1.49 VALUE: 1.49 - PREVIOUS VALUE: 0.86
+--------------------------
+PUMP 0
+3.0g
+START MILLIS: 22560 CURRENT MILLIS: 29167 
+PUMPED: 2.11 VALUE: 2.11 - PREVIOUS VALUE: 1.49
+--------------------------
+PUMP 0
+3.6g
+START MILLIS: 22560 CURRENT MILLIS: 29689 
+PUMPED: 2.63 VALUE: 2.63 - PREVIOUS VALUE: 2.11
+--------------------------
+PUMP 0
+4.0g
+START MILLIS: 22560 CURRENT MILLIS: 30210 
+PUMPED: 3.20 VALUE: 3.20 - PREVIOUS VALUE: 2.63
+--------------------------
+PUMP 0
+4.5g
+START MILLIS: 22560 CURRENT MILLIS: 30732 
+PUMPED: 3.71 VALUE: 3.71 - PREVIOUS VALUE: 3.20
+--------------------------
+PUMP 0
+5.0g
+START MILLIS: 22560 CURRENT MILLIS: 31253 
+PUMPED: 4.25 VALUE: 4.25 - PREVIOUS VALUE: 3.71
+--------------------------
+PUMP 0
+5.5g
+START MILLIS: 22560 CURRENT MILLIS: 31775 
+PUMPED: 4.71 VALUE: 4.71 - PREVIOUS VALUE: 4.25
+--------------------------
+PUMP 0
+6.2g
+START MILLIS: 22560 CURRENT MILLIS: 32297 
+PUMPED: 5.32 VALUE: 5.32 - PREVIOUS VALUE: 4.71
+--------------------------
+PUMP 0
+6.8g
+START MILLIS: 22560 CURRENT MILLIS: 32819 
+PUMPED: 5.79 VALUE: 5.79 - PREVIOUS VALUE: 5.32
+FLOW RATE: 5.79
+((calibration finished, 5.79mL per 10 sec))
+--------------------------
+PUMP 1
+7.2g
+CALIBRATION START
+SCALE: TARE
+START MILLIS: 33340 CURRENT MILLIS: 34209 
+PUMPED: 0.66 VALUE: 6.45 - PREVIOUS VALUE: 5.79
+--------------------------
+PUMP 1
+0.1g
+START MILLIS: 33340 CURRENT MILLIS: 34731 
+PUMPED: 0.66 VALUE: 0.00 - PREVIOUS VALUE: 0.00
+
+[...]
+
+PUMP 1
+6.5g
+START MILLIS: 33340 CURRENT MILLIS: 42035 
+PUMPED: 6.40 VALUE: 5.74 - PREVIOUS VALUE: 5.26
+--------------------------
+PUMP 1
+7.1g
+START MILLIS: 33340 CURRENT MILLIS: 42556 
+PUMPED: 6.91 VALUE: 6.25 - PREVIOUS VALUE: 5.74
+--------------------------
+PUMP 1
+7.6g
+START MILLIS: 33340 CURRENT MILLIS: 43078 
+PUMPED: 7.42 VALUE: 6.76 - PREVIOUS VALUE: 6.25
+--------------------------
+PUMP 1
+8.2g
+START MILLIS: 33340 CURRENT MILLIS: 43600 
+PUMPED: 8.00 VALUE: 7.34 - PREVIOUS VALUE: 6.76
+FLOW RATE: 8.00
+--------------------------
+PUMP 2
+8.5g
+CALIBRATION START
+SCALE: TARE
+START MILLIS: 44121 CURRENT MILLIS: 44990 
+PUMPED: 0.63 VALUE: 7.97 - PREVIOUS VALUE: 7.34
+--------------------------
+PUMP 2
+0.1g
+START MILLIS: 44121 CURRENT MILLIS: 45513 
+PUMPED: 0.63 VALUE: 0.00 - PREVIOUS VALUE: 0.00
+--------------------------
+PUMP 2
+0.0g
+START MILLIS: 44121 CURRENT MILLIS: 46034 
+PUMPED: 0.72 VALUE: 0.09 - PREVIOUS VALUE: 0.00
+
+[...]
+
+
+PUMP 2
+9.3g
+START MILLIS: 44121 CURRENT MILLIS: 53337 
+PUMPED: 8.89 VALUE: 8.26 - PREVIOUS VALUE: 7.46
+--------------------------
+PUMP 2
+10.2g
+START MILLIS: 44121 CURRENT MILLIS: 53859 
+PUMPED: 9.65 VALUE: 9.02 - PREVIOUS VALUE: 8.26
+--------------------------
+PUMP 2
+11.0g
+START MILLIS: 44121 CURRENT MILLIS: 54380 
+PUMPED: 10.46 VALUE: 9.83 - PREVIOUS VALUE: 9.02
+FLOW RATE: 10.46
+
+((automatic pipe cleaning))
+
+REVERSE START
+SCALE: OFF
+SCALE: ON
+SCALE: TARE
+SCALE: OFF
+27
+
+((Changing sliders to adjust output))
+Total:	53mL  	89%
+-----
+Pump0:	15.90mL  	30%	 flow rate factor: 5.79	running: 0
+Pump1:	14.31mL  	27%	 flow rate factor: 8.00	running: 0
+Pump2:	16.96mL  	32%	 flow rate factor: 10.46	running: 0
+CURRENT:0.00mL
+-----------------------------------
+0
+Total:	53mL  	59%
+-----
+Pump0:	0.00mL  	0%	 flow rate factor: 5.79	running: 0
+Pump1:	14.31mL  	27%	 flow rate factor: 8.00	running: 0
+Pump2:	16.96mL  	32%	 flow rate factor: 10.46	running: 0
+CURRENT:0.00mL
+-----------------------------------
+0
+Total:	53mL  	32%
+-----
+Pump0:	0.00mL  	0%	 flow rate factor: 5.79	running: 0
+Pump1:	0.00mL  	0%	 flow rate factor: 8.00	running: 0
+Pump2:	16.96mL  	32%	 flow rate factor: 10.46	running: 0
+CURRENT:0.00mL
+-----------------------------------
+
+[...]
+
+40
+Total:	100mL  	60%
+-----
+Pump0:	20.00mL  	20%	 flow rate factor: 5.79	running: 0
+Pump1:	40.00mL  	40%	 flow rate factor: 8.00	running: 0
+Pump2:	0.00mL  	0%	 flow rate factor: 10.46	running: 0
+CURRENT:0.00mL
+-----------------------------------
+30
+Total:	100mL  	50%
+-----
+Pump0:	20.00mL  	20%	 flow rate factor: 5.79	running: 0
+Pump1:	30.00mL  	30%	 flow rate factor: 8.00	running: 0
+Pump2:	0.00mL  	0%	 flow rate factor: 10.46	running: 0
+CURRENT:0.00mL
+-----------------------------------
+50
+Total:	100mL  	100%
+-----
+Pump0:	20.00mL  	20%	 flow rate factor: 5.79	running: 0
+Pump1:	30.00mL  	30%	 flow rate factor: 8.00	running: 0
+Pump2:	50.00mL  	50%	 flow rate factor: 10.46	running: 0
+CURRENT:0.00mL
+-----------------------------------
+((Pressed "on" here))
+
+SCALE: ON
+SCALE: TARE
+STARTING
+0.1g
+-0.03 += (-0.11 - 0.00) * 0.24 <- ((pump 0. is pumping 24% of the total value per second))
+-0.03 += (-0.11 - 0.00) * 0.33 <- ((pump 1. is pumping 33% of the total value per second))
+-0.05 += (-0.11 - 0.00) * 0.43 <- ((pump 2. is pumping 43% of the total value per second))
+-0.1g
+0.01 += (0.04 - -0.11) * 0.24
+0.01 += (0.04 - -0.11) * 0.33
+0.02 += (0.04 - -0.11) * 0.43
+-0.1g
+0.00 += (0.00 - 0.04) * 0.24
+0.00 += (0.00 - 0.04) * 0.33
+0.00 += (0.00 - 0.04) * 0.43
+-0.0g
+-0.01 += (-0.05 - 0.00) * 0.24
+-0.02 += (-0.05 - 0.00) * 0.33
+-0.02 += (-0.05 - 0.00) * 0.43
+0.6g
+0.10 += (0.42 - -0.05) * 0.24
+0.14 += (0.42 - -0.05) * 0.33
+0.18 += (0.42 - -0.05) * 0.43
+1.7g
+0.25 += (1.05 - 0.42) * 0.24
+0.35 += (1.05 - 0.42) * 0.33
+0.45 += (1.05 - 0.42) * 0.43
+3.5g
+0.61 += (2.55 - 1.05) * 0.24
+0.84 += (2.55 - 1.05) * 0.33
+1.10 += (2.55 - 1.05) * 0.43
+5.4g
+1.05 += (4.39 - 2.55) * 0.24
+1.45 += (4.39 - 2.55) * 0.33
+1.89 += (4.39 - 2.55) * 0.43
+7.3g
+1.54 += (6.46 - 4.39) * 0.24
+2.13 += (6.46 - 4.39) * 0.33
+2.79 += (6.46 - 4.39) * 0.43
+
+[...]
+
+18.95 += (79.38 - 77.44) * 0.24
+26.19 += (79.38 - 77.44) * 0.33
+34.24 += (79.38 - 77.44) * 0.43
+82.1g
+19.37 += (81.12 - 79.38) * 0.24
+26.77 += (81.12 - 79.38) * 0.33
+34.99 += (81.12 - 79.38) * 0.43
+84.1g
+19.83 += (83.08 - 81.12) * 0.24
+27.41 += (83.08 - 81.12) * 0.33
+35.83 += (83.08 - 81.12) * 0.43
+85.7g
+20.26 += (84.88 - 83.08) * 0.24
+
+LIMIT REACHED
+
+28.01 += (84.88 - 83.08) * 0.33 
+36.61 += (84.88 - 83.08) * 0.43 
+87.7g
+28.88 += (86.89 - 84.88) * 0.43 <- ((pump 1. is now pumping 33% of the total value per second))
+37.75 += (86.89 - 84.88) * 0.57 <- ((pump 2. is now pumping 24% of the total value per second))
+89.0g
+29.51 += (88.35 - 86.89) * 0.43
+38.58 += (88.35 - 86.89) * 0.57
+90.4g
+30.11 += (89.72 - 88.35) * 0.43
+
+LIMIT REACHED
+
+39.35 += (89.72 - 88.35) * 0.57
+91.6g
+40.62 += (90.99 - 89.72) * 1.00 <- ((pump 2. is now pumping 100% of the total value per second))
+92.4g
+41.66 += (92.03 - 90.99) * 1.00
+93.2g
+42.48 += (92.85 - 92.03) * 1.00
+94.0g
+43.26 += (93.63 - 92.85) * 1.00
+94.8g
+44.09 += (94.46 - 93.63) * 1.00
+95.5g
+44.73 += (95.10 - 94.46) * 1.00
+96.3g
+45.46 += (95.83 - 95.10) * 1.00
+97.1g
+46.41 += (96.78 - 95.83) * 1.00
+97.8g
+47.14 += (97.51 - 96.78) * 1.00
+98.6g
+47.89 += (98.26 - 97.51) * 1.00
+99.5g
+48.60 += (98.97 - 98.26) * 1.00
+100.2g
+49.38 += (99.75 - 98.97) * 1.00
+100.9g
+50.19 += (100.56 - 99.75) * 1.00
+LIMIT REACHED
+REVERSE START ((automatic cleaning started))
+101.3g
+101.2g
+101.1g
+101.1g
+101.1g
+101.1g
+101.0g
+101.2g
+101.1g
+101.1g
+101.2g
+101.4g
+101.3g
+101.4g
+101.4g
+101.3g
+101.2g
+101.4g
+101.4g
+101.3g
+101.4g
+SCALE: OFF

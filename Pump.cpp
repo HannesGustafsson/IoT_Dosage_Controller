@@ -46,7 +46,7 @@ void Pump::off_amount(float value, float previous_value, float flow)
   Serial.print(value);
   Serial.print(" - ");
   Serial.print(previous_value);
-  Serial.print(") / ");
+  Serial.print(") * ");
   Serial.println(this->flow_rate/flow);
   }
 
