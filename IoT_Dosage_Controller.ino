@@ -28,6 +28,8 @@
 char auth[] = "3bQD5Gx07mXDwURgOcgTfJF0_akMI0nA";
 char ssid[] = "!";
 char pass[] = "Hannes93Gustafsson";
+
+// Blynk timers
 BlynkTimer timer;
 int start_timer;
 int calibration_timer;
@@ -35,6 +37,7 @@ int calibration_timer;
 bool running = false;
 bool reverse = false;
 
+// Time tracking variables
 unsigned long start_millis;
 unsigned long current_millis;
 
@@ -76,8 +79,10 @@ void setup()
   pinMode(WATER_IN, INPUT);
   Blynk.begin(auth, ssid, pass);
 
+  // Create Blynk specific timers that, when enabled, will run a set function with a set interval
+  // Since Blynk does not approve of While loops
   start_timer = timer.setInterval(300L, start);
-  calibration_timer = timer.setInterval(300L, calibrate);
+  calibration_timer = timer.setInterval(400L, calibrate);
   timer.disable(start_timer);
   timer.disable(calibration_timer);
 }
@@ -88,9 +93,9 @@ void loop()
   Blynk.run();
   timer.run();
 }
-// ==================================================< PROGRAM END >==================================================
 
 
+// ==================================================< BLYNK CONTOLS START >==================================================
 // Controls the 1st Blynk slider & and values for pump_0
 BLYNK_WRITE(V0)
 {
@@ -127,7 +132,7 @@ BLYNK_WRITE(V3)
 }
 
 
-// Controls the Blynk START button which in turn enables the START function
+// Controls the Blynk START switch which in turn enables the START function
 BLYNK_WRITE(V7)
 {
   if (param.asInt() == 1)
@@ -149,7 +154,7 @@ BLYNK_WRITE(V7)
 }
 
 
-// Controls the Blynk CALIBRATION button which in turn enables the CALIBRATION function
+// Controls the Blynk CALIBRATION switch which in turn enables the CALIBRATION function
 BLYNK_WRITE(V10)
 {
   if (param.asInt() == 1)
@@ -169,9 +174,13 @@ BLYNK_WRITE(V10)
   }
 }
 
-
+// ============================< START FUNCTION >==============================
+// Starts pumping sequence
 void start()
 {
+  // Will only run during the first iteration of this function
+  // Starts up all the pumps
+  // Firsly zeroes the scale, then starts up all the pumps, unless their set amount is less than scale value +1 (to account for inconsistencies)
   if (running == false)
   {
     scale.zero();
@@ -181,6 +190,7 @@ void start()
     pump_2.on_cw(scale.value);
     running = true;
   }
+  // Checks if every sucking tube is connected to some kind of liquid, if not - the pumps will turn off and an error is sent
   else if (running == true && water_connection() == false)
   {
     Serial.println("WATER CONNECTION: FALSE");
@@ -188,6 +198,9 @@ void start()
     pump_1.off();
     pump_2.off();
   }
+  // Updates the blynk interface, showing the amount pumped already in mL
+  // Continually measures the weight, calculates, and controls if the pumps have reached their set limit and needs to be turned off
+  // when all pumps are turned off it will initialize the cleaning sequence detailed further down
   else if (running == true)
   {
     Blynk.virtualWrite(V8, scale.value);
@@ -203,8 +216,9 @@ void start()
 }
 
 
-
+// ============================< CALIBRATE FUNCTION >==============================
 // Calibrates all three pumps
+// Explained further in the next function
 void calibrate()
 {
   if (pump_0.calibrated == false)
@@ -228,12 +242,18 @@ void calibrate()
   }
 }
 
-
+// ============================< CALIBRATE PUMP FUNCTION >==============================
+// Calibrates the pumps one by one to measure the amount of liquid they deliver in 10 seconds
+// Knowing this number(flow_rate) gives us the pump's speed relative to the other pumps
+// This is useful to know since all three pumps are operating at the same time
+// since we need to know exactly how much of the total liquid delivered is from one single pump
 void calibrate_pump(Pump& p, float value, float previous_value, unsigned long& start, unsigned long& current)
 {
   
   scale.measure();
 
+  // Only runs if this the first iteration of the funtion
+  // Zeros the scale and turns on pump
   if (p.calibration_start == false)
   {
     Serial.println("CALIBRATION START");
@@ -245,6 +265,9 @@ void calibrate_pump(Pump& p, float value, float previous_value, unsigned long& s
     p.calibration_start = true;
   }
 
+  // All subsequent iterations will be led here
+  // p.amount_pumped will tick up, based on the value of the scale, for as long as current time is less than start time + 10sec
+  // When limit is reached the number is saved as the pumps flow_rate and the calibration is complete
   if (p.calibration_start == true)
   {
     current = millis();
@@ -275,7 +298,7 @@ void calibrate_pump(Pump& p, float value, float previous_value, unsigned long& s
   }
 }
 
-
+// ============================< CLEAN FUNCTION >==============================
 // Runs the pumps once in reverse for 3.5 seconds to remove all excess liquid from the tubes
 // and provide a clean start for all pump, meaning that they have to pump liquid the same distance
 // after for example only one pump was used previously
@@ -306,6 +329,7 @@ void clean()
   }
 }
 
+// ============================< WATER CONNECTION FUNCTION >==============================
 // Sends a electrical pulse through the water sensors and controld if the signal returns
 // thus implying the that all three water tubes are connected to a conductive liquid
 bool water_connection()
@@ -324,7 +348,7 @@ bool water_connection()
   }
 }
 
-
+// ============================< SET PERCENTAGES FUNCTION >==============================
 // Calculates the individual percentage of the total user specified amount of liquid a single pump is to deliver
 // based on the value of the others, to make sure the total percentage is never over 100%
 // and to enable accurate control of all three pumps individually
@@ -349,9 +373,9 @@ void set_percentage(float input, Pump& a, Pump& b, Pump& c)
   Blynk.virtualWrite(V2, pump_2.percentage);
 }
 
-
+// ============================< SET TOTAL FUNCTION >==============================
 // Calculates amount for each pump to deliver based on total amount of liquid specified
-// and percentage value of the pumps
+// and percentage of each pump
 void set_total()
 {
   total_percentage = pump_0.percentage + pump_1.percentage + pump_2.percentage;
@@ -375,6 +399,7 @@ void set_total()
   Blynk.virtualWrite(V6, pump_2.amount);
 }
 
+// ============================< GET RUNNING FUNCTION >==============================
 // Returns the number of active pumps
 float get_running()
 {
@@ -391,8 +416,8 @@ float get_running()
   return temp;
 }
 
-
-// Returns the combined flow rate of active pumps
+// ============================< GET FLOW FUNCTION >==============================
+// Returns the combined flow rate factor of active pumps
 float get_flow()
 {
   float temp = 0;
@@ -408,7 +433,7 @@ float get_flow()
   return temp;
 }
 
-
+// ============================< PUMP STATUS FUNCTION >==============================
 // Prints all the values of chosen pump
 void pump_status(Pump p)
 {
@@ -422,7 +447,7 @@ void pump_status(Pump p)
   Serial.println(p.running);
 }
 
-
+// ============================< PRINT STATUS FUNCTION >==============================
 // Prints total values, status of all pumps, as well as current measurement
 void print_status()
 {
@@ -444,9 +469,3 @@ void print_status()
   Serial.print(scale.value);
   Serial.println("mL\n-----------------------------------");
 }
-
-// BENCHMARK, How long it takes to pump 1dl of water
-// PUMP_0 CW:1m30s CCW:1m30s
-// PUMP_1 CW:1m30s CCW:1m30s
-// PUMP_2 CW:1m15s CCW:1m15s
-// ALL    CW:30s

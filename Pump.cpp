@@ -7,7 +7,7 @@ Pump::Pump(byte p_input, byte n_input)
   this->n = n_input;
 }
 
-
+// Sets pins and prints status
 void Pump::init()
 {
   pinMode(this->p, OUTPUT);
@@ -15,7 +15,7 @@ void Pump::init()
   Serial.println("PUMP: INITIALIZED");
 }
 
-
+// Turns on pump clock wise if set amount is higher than scale value + 1 to account for inconsistencies
 void Pump::on_cw(float value)
 {
   if((value + 1) < this->amount)
@@ -26,6 +26,7 @@ void Pump::on_cw(float value)
   }
 }
 
+// Turns on pump counter clock wise
 void Pump::on_ccw()
 {
   digitalWrite(this->p, LOW);
@@ -33,7 +34,8 @@ void Pump::on_ccw()
 }
 
 
-// Calculates amount of liquid each pump has delivered
+// Calculates amount of liquid each pump has delivered based on it's percentage of the total flow rate
+// by taking the pump's personal flow rate and dividing it by the flow of all currently running pumps added together 
 void Pump::off_amount(float value, float previous_value, float flow)
 {
   this->amount_pumped += ((value - previous_value) * (this->flow_rate/flow));
@@ -48,6 +50,7 @@ void Pump::off_amount(float value, float previous_value, float flow)
   Serial.println(this->flow_rate/flow);
   }
 
+  // If pumped amount exceeds the set amount the pump is turned off and status set to not running
   if(this->amount_pumped > this->amount && this->running == true)
   {
     Serial.println("LIMIT REACHED");
@@ -58,7 +61,7 @@ void Pump::off_amount(float value, float previous_value, float flow)
   }
 }
 
-
+// Turns off pump
 void Pump::off()
 {
   digitalWrite(p, LOW);
