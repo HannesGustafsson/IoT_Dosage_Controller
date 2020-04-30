@@ -27,7 +27,7 @@
 // Blynk code & Network Settings
 char auth[] = "3bQD5Gx07mXDwURgOcgTfJF0_akMI0nA";
 char ssid[] = "!";
-char pass[] = "Hannes93Gustafsson";
+char pass[] = "";
 
 // Blynk timers
 BlynkTimer timer;
@@ -132,7 +132,7 @@ BLYNK_WRITE(V3)
 }
 
 
-// Controls the Blynk START switch which in turn enables the START function
+// Controls the Blynk START switch which in turn enables and disables the START function
 BLYNK_WRITE(V7)
 {
   if (param.asInt() == 1)
